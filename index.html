@@ -55,7 +55,7 @@
     <div id="storer-dashboard" class="hidden">
         <!-- Navbar -->
         <nav class="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
-            <div class="text-xl font-bold text-blue-600">Cold Storage Finder</div>
+            <span id="storer-home-button" class="text-xl font-bold text-blue-600 cursor-pointer">Cold Storage Finder</span>
             <div class="flex items-center space-x-4">
                 <svg id="profile-icon" class="w-8 h-8 text-gray-500 cursor-pointer" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.67 0-5.33-1.34-8-4 2.67-2.66 5.33-4 8-4s5.33 1.34 8 4c-2.67 2.66-5.33 4-8 4z"></path>
@@ -93,7 +93,7 @@
     <div id="owner-dashboard" class="hidden">
         <!-- Navbar -->
         <nav class="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
-            <div class="text-xl font-bold text-blue-600">Cold Storage Finder</div>
+            <span id="owner-home-button" class="text-xl font-bold text-blue-600 cursor-pointer">Cold Storage Finder</span>
             <div class="flex items-center space-x-4">
                 <svg id="profile-icon-owner" class="w-8 h-8 text-gray-500 cursor-pointer" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.67 0-5.33-1.34-8-4 2.67-2.66 5.33-4 8-4s5.33 1.34 8 4c-2.67 2.66-5.33 4-8 4z"></path>
@@ -127,7 +127,7 @@
     <div id="add-storage-page" class="hidden">
         <!-- Navbar -->
         <nav class="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
-            <div class="text-xl font-bold text-blue-600">Cold Storage Finder</div>
+            <span id="add-home-button" class="text-xl font-bold text-blue-600 cursor-pointer">Cold Storage Finder</span>
             <div class="flex items-center space-x-4">
                 <svg id="profile-icon-add" class="w-8 h-8 text-gray-500 cursor-pointer" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.67 0-5.33-1.34-8-4 2.67-2.66 5.33-4 8-4s5.33 1.34 8 4c-2.67 2.66-5.33 4-8 4z"></path>
@@ -198,7 +198,7 @@
     <div id="details-page" class="hidden">
         <!-- Navbar for details page -->
         <nav class="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
-            <div class="text-xl font-bold text-blue-600">Cold Storage Finder</div>
+            <span id="details-home-button" class="text-xl font-bold text-blue-600 cursor-pointer">Cold Storage Finder</span>
             <div class="flex items-center space-x-4">
                 <svg id="profile-icon-details" class="w-8 h-8 text-gray-500 cursor-pointer" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.67 0-5.33-1.34-8-4 2.67-2.66 5.33-4 8-4s5.33 1.34 8 4c-2.67 2.66-5.33 4-8 4z"></path>
@@ -346,6 +346,12 @@
         const successModal = document.getElementById('success-modal');
         const continueButton = document.getElementById('continue-button');
 
+        const storerHomeButton = document.getElementById('storer-home-button');
+        const ownerHomeButton = document.getElementById('owner-home-button');
+        const addHomeButton = document.getElementById('add-home-button');
+        const detailsHomeButton = document.getElementById('details-home-button');
+
+
         let currentUserRole = '';
         let currentUserId = '';
 
@@ -447,6 +453,16 @@
             profileModal.classList.add('hidden');
             addStoragePage.classList.add('hidden');
             successModal.classList.add('hidden');
+        }
+
+        function returnToDashboard() {
+            hideAllPages();
+            if (currentUserRole === 'Storer') {
+                storerDashboard.classList.remove('hidden');
+                renderListings(coldStorages);
+            } else if (currentUserRole === 'Cold Storage Owner') {
+                ownerDashboard.classList.remove('hidden');
+            }
         }
 
         loginForm.addEventListener('submit', (e) => {
@@ -556,10 +572,13 @@
             currentUserId = '';
         });
 
-        backButton.addEventListener('click', () => {
-            detailsPageContainer.classList.add('hidden');
-            storerDashboard.classList.remove('hidden');
-        });
+        // Event listeners for back buttons and home buttons
+        backButton.addEventListener('click', returnToDashboard);
+        backButtonAdd.addEventListener('click', returnToDashboard);
+        storerHomeButton.addEventListener('click', returnToDashboard);
+        ownerHomeButton.addEventListener('click', returnToDashboard);
+        addHomeButton.addEventListener('click', returnToDashboard);
+        detailsHomeButton.addEventListener('click', returnToDashboard);
 
         document.addEventListener('DOMContentLoaded', () => {
             searchInput.addEventListener('input', filterListings);
