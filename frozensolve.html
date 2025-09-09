@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cold Storage Finder India</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Login Page -->
+    <div id="login-container" class="flex items-center justify-center min-h-screen p-4" style="background-image: url('https://images.unsplash.com/photo-1541582236894-67ae779268f6?q=80&w=2940&auto=format&fit=crop'); background-size: cover; background-position: center;">
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 sm:p-12 text-center transform transition-transform duration-500 ease-in-out hover:scale-105">
+            <svg class="w-16 h-16 mx-auto text-blue-600 mb-4" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-6h-2v6zm0-8h2V7h-2v2z"></path>
+            </svg>
+            <h1 class="text-3xl font-bold text-gray-800 mb-6">Welcome</h1>
+            <div id="login-error" class="bg-red-100 text-red-700 px-4 py-3 rounded-xl text-sm mb-4 hidden" role="alert">
+                Incorrect username or password.
+            </div>
+            <form id="login-form" class="space-y-6">
+                <div>
+                    <label for="role" class="block text-sm font-medium text-gray-700 text-left">Select Role</label>
+                    <select id="role" class="mt-1 block w-full rounded-lg border-2 border-gray-300 shadow-sm p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                        <option value="storer">I want to store food/veggies</option>
+                        <option value="owner">I have a cold storage facility</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="username" class="block text-sm font-medium text-gray-700 text-left">Username</label>
+                    <input type="text" id="username" class="mt-1 block w-full rounded-lg border-2 border-gray-300 shadow-sm p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" required>
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 text-left">Password</label>
+                    <input type="password" id="password" class="mt-1 block w-full rounded-lg border-2 border-gray-300 shadow-sm p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all" required>
+                </div>
+                <button type="submit" class="w-full py-3 px-4 rounded-lg shadow-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                    Log In
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application UI (Storer Dashboard) -->
+    <div id="storer-dashboard" class="hidden">
+        <!-- Navbar -->
+        <nav class="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
+            <div class="text-xl font-bold text-blue-600">Cold Storage Finder</div>
+            <div class="flex items-center space-x-4">
+                <svg id="profile-icon" class="w-8 h-8 text-gray-500 cursor-pointer" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.67 0-5.33-1.34-8-4 2.67-2.66 5.33-4 8-4s5.33 1.34 8 4c-2.67 2.66-5.33 4-8 4z"></path>
+                </svg>
+            </div>
+        </nav>
+
+        <div class="p-4 sm:p-8 max-w-4xl mx-auto">
+            <div class="bg-white rounded-xl shadow-lg p-6 sm:p-8">
+                <h1 class="text-3xl sm:text-4xl font-bold text-center text-gray-800 mb-2">Cold Storage Finder</h1>
+                <p class="text-center text-gray-500 mb-6 sm:mb-8">Find the ideal cold storage for your produce in India.</p>
+
+                <!-- Search Section -->
+                <div class="flex flex-col sm:flex-row items-center gap-4 mb-8">
+                    <input type="text" id="searchInput" placeholder="Search by name, city or state..." class="flex-grow w-full sm:w-auto p-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                </div>
+
+                <!-- Cold Storage Listings Container -->
+                <div id="listingsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <!-- Listings will be dynamically inserted here -->
+                </div>
+
+                <!-- No Results Message -->
+                <div id="noResults" class="hidden text-center text-gray-500 py-10">
+                    <svg class="w-16 h-16 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M16 12a4 4 0 00-8 0m5.656 5.656A4 4 0 0110.828 8.172m0 0L3 16l3 3m5.656-5.656L16 12m-3 3l-3 3M12 21a9 9 0 110-18 9 9 0 010 18z"></path>
+                    </svg>
+                    <p class="text-lg">No cold storages found matching your criteria.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cold Storage Owner Dashboard -->
+    <div id="owner-dashboard" class="hidden">
+        <!-- Navbar -->
+        <nav class="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
+            <div class="text-xl font-bold text-blue-600">Cold Storage Finder</div>
+            <div class="flex items-center space-x-4">
+                <svg id="profile-icon-owner" class="w-8 h-8 text-gray-500 cursor-pointer" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.67 0-5.33-1.34-8-4 2.67-2.66 5.33-4 8-4s5.33 1.34 8 4c-2.67 2.66-5.33 4-8 4z"></path>
+                </svg>
+            </div>
+        </nav>
+        <div class="p-4 sm:p-8 max-w-4xl mx-auto">
+            <div class="bg-white rounded-xl shadow-lg p-6 sm:p-8">
+                <h1 class="text-3xl sm:text-4xl font-bold text-center text-gray-800 mb-2">Owner Dashboard</h1>
+                <p class="text-center text-gray-500 mb-6 sm:mb-8">Add a new cold storage facility to the platform.</p>
+                
+                <form id="add-storage-form" class="space-y-4">
+                    <div>
+                        <label for="storage-name" class="block text-sm font-medium text-gray-700">Storage Name</label>
+                        <input type="text" id="storage-name" class="mt-1 block w-full rounded-lg border-2 border-gray-300 shadow-sm p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="storage-location" class="block text-sm font-medium text-gray-700">Location (City, State)</label>
+                        <input type="text" id="storage-location" class="mt-1 block w-full rounded-lg border-2 border-gray-300 shadow-sm p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                    </div>
+                    <div>
+                        <label for="storage-availability" class="block text-sm font-medium text-gray-700">Availability Status</label>
+                        <select id="storage-availability" class="mt-1 block w-full rounded-lg border-2 border-gray-300 shadow-sm p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <option value="Available Now">Available Now</option>
+                            <option value="Limited Availability">Limited Availability</option>
+                            <option value="Booked">Booked</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex-1">
+                            <label for="storage-transportation" class="block text-sm font-medium text-gray-700">Provides Transportation</label>
+                            <select id="storage-transportation" class="mt-1 block w-full rounded-lg border-2 border-gray-300 shadow-sm p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                        <div class="flex-1">
+                            <label for="storage-labor" class="block text-sm font-medium text-gray-700">Provides Labor</label>
+                            <select id="storage-labor" class="mt-1 block w-full rounded-lg border-2 border-gray-300 shadow-sm p-3 focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="storage-transportation-cost" class="block text-sm font-medium text-gray-700">Transportation Cost</label>
+                        <input type="text" id="storage-transportation-cost" class="mt-1 block w-full rounded-lg border-2 border-gray-300 shadow-sm p-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label for="storage-description" class="block text-sm font-medium text-gray-700">Description</label>
+                        <textarea id="storage-description" rows="3" class="mt-1 block w-full rounded-lg border-2 border-gray-300 shadow-sm p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-3 px-4 rounded-lg shadow-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                        Add Cold Storage
+                    </button>
+                    <div id="add-success" class="mt-4 text-center text-green-700 hidden">
+                        Successfully added new cold storage! It is now visible to storers.
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cold Storage Details Page (Hidden by default) -->
+    <div id="details-page" class="hidden">
+        <!-- Navbar for details page -->
+        <nav class="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
+            <div class="text-xl font-bold text-blue-600">Cold Storage Finder</div>
+            <div class="flex items-center space-x-4">
+                <svg id="profile-icon-details" class="w-8 h-8 text-gray-500 cursor-pointer" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.67 0-5.33-1.34-8-4 2.67-2.66 5.33-4 8-4s5.33 1.34 8 4c-2.67 2.66-5.33 4-8 4z"></path>
+                </svg>
+            </div>
+        </nav>
+        
+        <div class="p-4 sm:p-8 max-w-2xl mx-auto bg-white rounded-xl shadow-lg mt-8">
+            <button id="backButton" class="text-blue-600 hover:text-blue-800 font-medium mb-6 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Search
+            </button>
+            
+            <h2 id="details-name" class="text-3xl font-bold text-gray-800 mb-4"></h2>
+            <div id="details-content" class="space-y-4">
+                <!-- Details will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal (Hidden by default) -->
+    <div id="profile-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center modal-backdrop">
+        <div class="bg-white rounded-xl shadow-2xl p-6 w-80">
+            <div class="text-center mb-4">
+                <svg class="w-16 h-16 mx-auto text-blue-600 mb-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.67 0-5.33-1.34-8-4 2.67-2.66 5.33-4 8-4s5.33 1.34 8 4c-2.67 2.66-5.33 4-8 4z"></path>
+                </svg>
+                <h3 id="profile-modal-role" class="text-lg font-bold text-gray-800"></h3>
+            </div>
+            <button id="logout-button" class="w-full py-2 px-4 rounded-lg shadow-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors">
+                Logout
+            </button>
+        </div>
+    </div>
+
+
+    <script>
+        let coldStorages = [
+            {
+                name: "Himalayan Cold Storage",
+                location: "Shimla, Himachal Pradesh",
+                availability: "Available Now",
+                transportation: true,
+                transportationCost: "₹500 per ton",
+                labor: true,
+                description: "Ideal for fruits and vegetables, located in the serene hills of Shimla. Provides transportation for local produce."
+            },
+            {
+                name: "Delhi Perishables Hub",
+                location: "New Delhi, Delhi",
+                availability: "Limited Availability",
+                transportation: false,
+                transportationCost: "N/A",
+                labor: true,
+                description: "State-of-the-art facility serving the NCR region. Specializes in onion and potato storage."
+            },
+            {
+                name: "Mumbai Agri-Freezer",
+                location: "Mumbai, Maharashtra",
+                availability: "Call for Pricing",
+                transportation: true,
+                transportationCost: "₹750 per ton",
+                labor: false,
+                description: "Located near the port for easy import/export. Automated systems to reduce labor costs."
+            },
+            {
+                name: "Chennai Cool Logistics",
+                location: "Chennai, Tamil Nadu",
+                availability: "Available Now",
+                transportation: true,
+                transportationCost: "Negotiable",
+                labor: true,
+                description: "Secure, temperature-controlled facility with 24/7 security. Ideal for high-value goods."
+            },
+            {
+                name: "Kolkata Fresh Preserve",
+                location: "Kolkata, West Bengal",
+                availability: "Booked",
+                transportation: false,
+                transportationCost: "N/A",
+                labor: true,
+                description: "A well-established facility with flexible storage options for both short and long-term needs."
+            },
+            {
+                name: "Ahmedabad Potato Store",
+                location: "Ahmedabad, Gujarat",
+                availability: "Available Now",
+                transportation: false,
+                transportationCost: "N/A",
+                labor: false,
+                description: "Specialized cold storage for potatoes with large capacity and easy access."
+            }
+        ];
+
+        const loginForm = document.getElementById('login-form');
+        const loginContainer = document.getElementById('login-container');
+        const storerDashboard = document.getElementById('storer-dashboard');
+        const ownerDashboard = document.getElementById('owner-dashboard');
+        const detailsPageContainer = document.getElementById('details-page');
+        const detailsName = document.getElementById('details-name');
+        const detailsContent = document.getElementById('details-content');
+        const backButton = document.getElementById('backButton');
+        const loginError = document.getElementById('login-error');
+        const searchInput = document.getElementById('searchInput');
+        const listingsContainer = document.getElementById('listingsContainer');
+        const noResultsMessage = document.getElementById('noResults');
+        const roleSelect = document.getElementById('role');
+        const profileIcon = document.getElementById('profile-icon');
+        const profileIconOwner = document.getElementById('profile-icon-owner');
+        const profileIconDetails = document.getElementById('profile-icon-details');
+        const profileModal = document.getElementById('profile-modal');
+        const profileModalRole = document.getElementById('profile-modal-role');
+        const logoutButton = document.getElementById('logout-button');
+        const addStorageForm = document.getElementById('add-storage-form');
+        const addSuccessMessage = document.getElementById('add-success');
+
+        let currentUserRole = '';
+
+        function renderListings(filteredListings) {
+            listingsContainer.innerHTML = '';
+            if (filteredListings.length === 0) {
+                noResultsMessage.classList.remove('hidden');
+                return;
+            }
+            noResultsMessage.classList.add('hidden');
+            
+            filteredListings.forEach(storage => {
+                const card = document.createElement('div');
+                card.classList.add('bg-white', 'p-6', 'rounded-lg', 'shadow-md', 'border', 'border-gray-200', 'cursor-pointer', 'hover:shadow-lg', 'transition-shadow');
+                card.addEventListener('click', () => showDetails(storage));
+
+                let availabilityColor = '';
+                if (storage.availability === 'Available Now') {
+                    availabilityColor = 'bg-green-100 text-green-800';
+                } else if (storage.availability === 'Limited Availability') {
+                    availabilityColor = 'bg-yellow-100 text-yellow-800';
+                } else {
+                    availabilityColor = 'bg-red-100 text-red-800';
+                }
+
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">${storage.name}</h2>
+                        <span class="px-3 py-1 text-xs font-medium rounded-full ${availabilityColor}">${storage.availability}</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-3">${storage.description}</p>
+                    <div class="space-y-2 text-sm text-gray-700">
+                        <p class="flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                            </svg>
+                            ${storage.location}
+                        </p>
+                        <p class="flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zm-3 5h6a.5.5 0 00.5-.5V14a2 2 0 10-4 0v1.5a.5.5 0 00.5.5zm5-3.5a.5.5 0 00-.5-.5H8a.5.5 0 00-.5.5V14a.5.5 0 00.5.5h1a.5.5 0 00.5-.5V12.5z"></path>
+                            </svg>
+                            Transportation: ${storage.transportation ? 'Yes' : 'No'} (${storage.transportationCost})
+                        </p>
+                        <p class="flex items-center">
+                            <svg class="w-4 h-4 mr-2 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                            </svg>
+                            Labor: ${storage.labor ? 'Yes' : 'No'}
+                        </p>
+                    </div>
+                `;
+                listingsContainer.appendChild(card);
+            });
+        }
+
+        function showDetails(storage) {
+            storerDashboard.classList.add('hidden');
+            detailsPageContainer.classList.remove('hidden');
+            
+            detailsName.textContent = storage.name;
+            detailsContent.innerHTML = `
+                <p class="text-sm text-gray-600">${storage.description}</p>
+                <div class="space-y-4">
+                    <p class="flex items-center text-lg">
+                        <svg class="w-5 h-5 mr-2 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <strong>Location:</strong> ${storage.location}
+                    </p>
+                    <p class="flex items-center text-lg">
+                        <strong>Availability:</strong> <span class="ml-2 px-3 py-1 text-sm font-medium rounded-full ${storage.availability === 'Available Now' ? 'bg-green-100 text-green-800' : (storage.availability === 'Limited Availability' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800')}">${storage.availability}</span>
+                    </p>
+                    <p class="flex items-center text-lg">
+                        <strong>Transportation:</strong> ${storage.transportation ? 'Yes' : 'No'} (${storage.transportationCost})
+                    </p>
+                    <p class="flex items-center text-lg">
+                        <strong>Labor:</strong> ${storage.labor ? 'Yes' : 'No'}
+                    </p>
+                </div>
+            `;
+        }
+
+        function filterListings() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filtered = coldStorages.filter(storage => {
+                const locationMatch = storage.location.toLowerCase().includes(searchTerm);
+                const nameMatch = storage.name.toLowerCase().includes(searchTerm);
+                return locationMatch || nameMatch;
+            });
+            renderListings(filtered);
+        }
+
+        function hideAllPages() {
+            loginContainer.classList.add('hidden');
+            storerDashboard.classList.add('hidden');
+            ownerDashboard.classList.add('hidden');
+            detailsPageContainer.classList.add('hidden');
+            profileModal.classList.add('hidden');
+        }
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const role = roleSelect.value;
+
+            hideAllPages();
+
+            if (role === 'storer' && username === 'admin' && password === 'admin') {
+                storerDashboard.classList.remove('hidden');
+                renderListings(coldStorages);
+                currentUserRole = 'Storer';
+            } else if (role === 'owner' && username === 'admin1' && password === 'admin1') {
+                ownerDashboard.classList.remove('hidden');
+                currentUserRole = 'Cold Storage Owner';
+            } else {
+                loginContainer.classList.remove('hidden');
+                loginError.classList.remove('hidden');
+            }
+        });
+
+        addStorageForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newStorage = {
+                name: document.getElementById('storage-name').value,
+                location: document.getElementById('storage-location').value,
+                availability: document.getElementById('storage-availability').value,
+                transportation: document.getElementById('storage-transportation').value === 'true',
+                transportationCost: document.getElementById('storage-transportation-cost').value,
+                labor: document.getElementById('storage-labor').value === 'true',
+                description: document.getElementById('storage-description').value
+            };
+            coldStorages.push(newStorage);
+            addStorageForm.reset();
+            addSuccessMessage.classList.remove('hidden');
+            setTimeout(() => addSuccessMessage.classList.add('hidden'), 3000);
+            console.log("New cold storage added. Total listings:", coldStorages.length);
+        });
+
+        // Event listeners for showing profile modal
+        [profileIcon, profileIconOwner, profileIconDetails].forEach(icon => {
+            if (icon) {
+                icon.addEventListener('click', () => {
+                    profileModal.classList.remove('hidden');
+                    profileModalRole.textContent = `Logged in as ${currentUserRole}`;
+                });
+            }
+        });
+
+        // Event listener for hiding modal by clicking outside
+        profileModal.addEventListener('click', (e) => {
+            if (e.target.id === 'profile-modal') {
+                profileModal.classList.add('hidden');
+            }
+        });
+
+        // Event listener for logout
+        logoutButton.addEventListener('click', () => {
+            hideAllPages();
+            loginContainer.classList.remove('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            loginError.classList.add('hidden');
+        });
+
+        backButton.addEventListener('click', () => {
+            detailsPageContainer.classList.add('hidden');
+            storerDashboard.classList.remove('hidden');
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            searchInput.addEventListener('input', filterListings);
+        });
+    </script>
+</body>
+</html>
